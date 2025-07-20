@@ -2749,127 +2749,127 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-DefaultTalents-Standard-default-FullBuffs-0.0yards-LongMultiTarget"
  value: {
-  dps: 81000.1915
-  tps: 79493.07879
+  dps: 80869.07942
+  tps: 79231.46447
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-DefaultTalents-Standard-default-FullBuffs-0.0yards-LongSingleTarget"
  value: {
-  dps: 58701.71739
-  tps: 50147.56904
+  dps: 59196.14901
+  tps: 50545.56185
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-DefaultTalents-Standard-default-FullBuffs-0.0yards-ShortSingleTarget"
  value: {
-  dps: 89115.50416
-  tps: 62265.30215
+  dps: 89717.24427
+  tps: 62554.58769
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-DefaultTalents-Standard-default-NoBuffs-0.0yards-LongMultiTarget"
  value: {
-  dps: 64047.92833
-  tps: 65931.97458
+  dps: 64304.91719
+  tps: 66037.10507
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-DefaultTalents-Standard-default-NoBuffs-0.0yards-LongSingleTarget"
  value: {
-  dps: 46805.97551
-  tps: 40710.17624
+  dps: 47175.221
+  tps: 41013.367
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-DefaultTalents-Standard-default-NoBuffs-0.0yards-ShortSingleTarget"
  value: {
-  dps: 69408.42367
-  tps: 50970.04795
+  dps: 69454.73151
+  tps: 50830.93263
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-TalentsEMPrimal-Standard-default-FullBuffs-0.0yards-LongMultiTarget"
  value: {
-  dps: 83486.81164
-  tps: 76106.62458
+  dps: 83875.44492
+  tps: 76302.19793
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-TalentsEMPrimal-Standard-default-FullBuffs-0.0yards-LongSingleTarget"
  value: {
-  dps: 56070.9032
-  tps: 43968.60843
+  dps: 56110.07946
+  tps: 43817.48592
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-TalentsEMPrimal-Standard-default-FullBuffs-0.0yards-ShortSingleTarget"
  value: {
-  dps: 97999.9417
-  tps: 54736.75383
+  dps: 99077.05641
+  tps: 54970.37859
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-TalentsEMPrimal-Standard-default-NoBuffs-0.0yards-LongMultiTarget"
  value: {
-  dps: 65598.8837
-  tps: 62618.22916
+  dps: 66148.34698
+  tps: 63039.42972
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-TalentsEMPrimal-Standard-default-NoBuffs-0.0yards-LongSingleTarget"
  value: {
-  dps: 44950.91787
-  tps: 36078.98913
+  dps: 45215.64752
+  tps: 36216.11268
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-TalentsEMPrimal-Standard-default-NoBuffs-0.0yards-ShortSingleTarget"
  value: {
-  dps: 75725.55424
-  tps: 44577.69209
+  dps: 76257.46817
+  tps: 44725.4465
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-TalentsEchoUnleashed-Standard-default-FullBuffs-0.0yards-LongMultiTarget"
  value: {
-  dps: 79933.01934
-  tps: 76764.21115
+  dps: 80223.19446
+  tps: 76857.65368
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-TalentsEchoUnleashed-Standard-default-FullBuffs-0.0yards-LongSingleTarget"
  value: {
-  dps: 56105.19996
-  tps: 46405.84112
+  dps: 56445.90349
+  tps: 46663.36237
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-TalentsEchoUnleashed-Standard-default-FullBuffs-0.0yards-ShortSingleTarget"
  value: {
-  dps: 83045.8369
-  tps: 56596.26944
+  dps: 83545.29197
+  tps: 56920.353
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-TalentsEchoUnleashed-Standard-default-NoBuffs-0.0yards-LongMultiTarget"
  value: {
-  dps: 62893.67317
-  tps: 63338.20532
+  dps: 63086.86451
+  tps: 63370.32356
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-TalentsEchoUnleashed-Standard-default-NoBuffs-0.0yards-LongSingleTarget"
  value: {
-  dps: 44819.26684
-  tps: 37792.72594
+  dps: 44979.37251
+  tps: 37863.8946
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-preraid-TalentsEchoUnleashed-Standard-default-NoBuffs-0.0yards-ShortSingleTarget"
  value: {
-  dps: 63423.64085
-  tps: 45367.84175
+  dps: 63898.56151
+  tps: 45657.4936
  }
 }
 dps_results: {

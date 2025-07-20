@@ -429,6 +429,12 @@ func registerWeaponSpecializationAura(character *Character, config *weaponSpecia
 				(character.HasOHWeapon() && slices.Contains(config.weaponTypes, character.OffHand().WeaponType)) {
 				aura.Activate(sim)
 			}
+			character.spellRegistrationHandlers = append(character.spellRegistrationHandlers, func(spell *Spell) {
+				if aura.IsActive() {
+					mask = getCurrentProcMask()
+					spell.applyBonusExpertise(expertiseBonus, character, mask)
+				}
+			})
 		},
 		OnGain: func(aura *Aura, sim *Simulation) {
 			mask = getCurrentProcMask()
@@ -448,21 +454,19 @@ func registerWeaponSpecializationAura(character *Character, config *weaponSpecia
 	})
 }
 
+func (spell *Spell) applyBonusExpertise(expertiseBonus float64, character *Character, mask ProcMask) {
+	if mask == ProcMaskMeleeMH && character.HasOHWeapon() && !spell.ProcMask.Matches(ProcMaskMeleeMH) {
+		spell.BonusExpertiseRating -= expertiseBonus
+	} else if mask == ProcMaskMeleeOH && !spell.ProcMask.Matches(ProcMaskMeleeOH) {
+		spell.BonusExpertiseRating -= expertiseBonus
+	}
+}
+
 func applyWeaponSpecialization(sim *Simulation, character *Character, mask ProcMask, expertiseBonus float64) {
-	if mask == ProcMaskMelee || mask == ProcMaskMeleeMH {
+	if mask.Matches(ProcMaskMelee) {
 		character.AddStatDynamic(sim, stats.ExpertiseRating, expertiseBonus)
-		if mask == ProcMaskMeleeMH && character.HasOHWeapon() {
-			for _, spell := range character.Spellbook {
-				if !spell.ProcMask.Matches(mask) {
-					spell.BonusExpertiseRating -= expertiseBonus
-				}
-			}
-		}
-	} else if mask == ProcMaskMeleeOH {
 		for _, spell := range character.Spellbook {
-			if spell.ProcMask.Matches(mask) {
-				spell.BonusExpertiseRating += expertiseBonus
-			}
+			spell.applyBonusExpertise(expertiseBonus, character, mask)
 		}
 	}
 }
