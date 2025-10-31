@@ -113,6 +113,9 @@ import {
 	APLValueSpellFullCooldown,
 	APLValueDotTimeToNextTick,
 	APLValueSpellInFlight,
+	APLValueSpellIsHardcasting,
+	APLValueUnitIsHardcasting,
+	APLValueTimeToCastEnd,
 } from '../../proto/apl.js';
 import { Class, Spec } from '../../proto/common.js';
 import { ShamanTotems_TotemType as TotemType } from '../../proto/shaman.js';
@@ -680,6 +683,20 @@ const valueKindFactories: { [f in ValidAPLValueKind]: ValueKindConfig<APLValueIm
 		newValue: APLValueUnitDistance.create,
 		fields: [AplHelpers.unitFieldConfig('sourceUnit', 'aura_sources')],
 	}),
+	unitIsHardcasting: inputBuilder({
+		label: "Is Hardcasting",
+		submenu: ['unit'],
+		shortDescription: "",
+		newValue: APLValueUnitIsHardcasting.create,
+		fields: [AplHelpers.unitFieldConfig('sourceUnit', 'aura_sources')],
+	}),
+	timeToCastEnd: inputBuilder({
+		label: "Time To Cast End",
+		submenu: ['unit'],
+		shortDescription: "",
+		newValue: APLValueTimeToCastEnd.create,
+		fields: [AplHelpers.unitFieldConfig('sourceUnit', 'aura_sources')],
+	}),
 
 	// Resources
 	currentHealth: inputBuilder({
@@ -1142,6 +1159,13 @@ const valueKindFactories: { [f in ValidAPLValueKind]: ValueKindConfig<APLValueIm
 		shortDescription: i18n.t('rotation_tab.apl.values.spell_in_flight.tooltip'),
 		newValue: APLValueSpellInFlight.create,
 		fields: [AplHelpers.actionIdFieldConfig('spellId', 'spells_with_travelTime', '')],
+	}),
+	spellIsHardcasting: inputBuilder({
+		label: "Is Hardcasting",
+		submenu: ['spell'],
+		shortDescription: "",
+		newValue: APLValueSpellIsHardcasting.create,
+		fields: [AplHelpers.actionIdFieldConfig('spellId', 'castable_spells', '')],
 	}),
 
 	// Auras

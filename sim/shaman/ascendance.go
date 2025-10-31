@@ -77,7 +77,7 @@ func (shaman *Shaman) registerAscendanceSpell() {
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			// Lava Beam cast gets cancelled if ascendance fades during it
 			if (shaman.Hardcast.ActionID.SpellID == 114074) && shaman.Hardcast.Expires > sim.CurrentTime {
-				shaman.CancelHardcast(sim)
+				shaman.CancelHardcast(sim, 0)
 			}
 			if isEnh {
 				shaman.Stormstrike.CD.Set(shaman.Stormblast.CD.ReadyAt())

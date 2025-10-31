@@ -410,3 +410,28 @@ func (value *APLValueSpellInFlight) GetBool(sim *Simulation) bool {
 func (value *APLValueSpellInFlight) String() string {
 	return fmt.Sprintf("SpellInFlight(%s)", value.spell.ActionID)
 }
+
+type APLValueSpellIsHardcasting struct {
+	DefaultAPLValueImpl
+	spell *Spell
+}
+
+func (rot *APLRotation) newValueSpellIsHardcasting(config *proto.APLValueSpellIsHardcasting, _ *proto.UUID) APLValue {
+	spell := rot.GetAPLSpell(config.SpellId)
+	if spell == nil {
+		return nil
+	}
+	return &APLValueSpellIsHardcasting{
+		spell: spell,
+	}
+}
+
+func (value *APLValueSpellIsHardcasting) Type() proto.APLValueType {
+	return proto.APLValueType_ValueTypeBool
+}
+func (value *APLValueSpellIsHardcasting) GetBool(sim *Simulation) bool {
+	return value.spell.Unit.Hardcast.Expires > sim.CurrentTime && value.spell.Unit.Hardcast.ActionID.SpellID == value.spell.SpellID
+}
+func (value *APLValueSpellIsHardcasting) String() string {
+	return fmt.Sprintf("SpellIsHardcasting(%s)", value.spell.ActionID)
+}

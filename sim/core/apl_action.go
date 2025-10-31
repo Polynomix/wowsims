@@ -184,6 +184,8 @@ func (rot *APLRotation) newAPLActionImpl(config *proto.APLAction) APLActionImpl 
 		return rot.newActionCastAllStatBuffCooldowns(config.GetCastAllStatBuffCooldowns())
 	case *proto.APLAction_AutocastOtherCooldowns:
 		return rot.newActionAutocastOtherCooldowns(config.GetAutocastOtherCooldowns())
+	case *proto.APLAction_CancelCast:
+		return rot.newActionCancelCast(config.GetCancelCast())
 
 	// Timing
 	case *proto.APLAction_Wait:

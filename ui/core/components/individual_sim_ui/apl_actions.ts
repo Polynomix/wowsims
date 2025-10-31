@@ -33,6 +33,7 @@ import {
 	APLActionWaitUntil,
 	APLValue,
 	APLActionWarlockNextExhaleTarget,
+	APLActionCancelCast,
 } from '../../proto/apl.js';
 import { Spec } from '../../proto/common.js';
 import { FeralDruid_Rotation_AplType } from '../../proto/druid.js';
@@ -480,6 +481,17 @@ const actionKindFactories: { [f in NonNullable<APLActionKind>]: ActionKindConfig
 		includeIf: (player: Player<any>, isPrepull: boolean) => !isPrepull,
 		newValue: APLActionAutocastOtherCooldowns.create,
 		fields: [],
+	}),
+	['cancelCast']: inputBuilder({
+		label: "Cancel Cast",
+		submenu: ['casting'],
+		shortDescription: "",
+		includeIf: (player: Player<any>, _isPrepull: boolean) => player.getSpec() == Spec.SpecElementalShaman,
+		newValue: APLActionCancelCast.create,
+		fields: [AplHelpers.numberFieldConfig('delay', false, {
+				label: "Time To Next Action",
+				labelTooltip: "",
+			})],
 	}),
 	['wait']: inputBuilder({
 		label: i18n.t('rotation_tab.apl.actions.wait.label'),

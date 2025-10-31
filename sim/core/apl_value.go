@@ -172,6 +172,10 @@ func (rot *APLRotation) newAPLValueWithContext(config *proto.APLValue, groupVari
 		value = rot.newValueUnitIsMoving(config.GetUnitIsMoving(), config.Uuid)
 	case *proto.APLValue_UnitDistance:
 		value = rot.newValueUnitDistance(config.GetUnitDistance(), config.Uuid)
+	case *proto.APLValue_UnitIsHardcasting:
+		value = rot.newValueUnitIsHardcasting(config.GetUnitIsHardcasting(), config.Uuid)
+	case *proto.APLValue_TimeToCastEnd:
+		value = rot.newValueTimeToCastEnd(config.GetTimeToCastEnd(), config.Uuid)
 
 	// GCD
 	case *proto.APLValue_GcdIsReady:
@@ -214,6 +218,8 @@ func (rot *APLRotation) newAPLValueWithContext(config *proto.APLValue, groupVari
 		value = rot.newValueSpellFullCooldown(config.GetSpellFullCooldown(), config.Uuid)
 	case *proto.APLValue_SpellInFlight:
 		value = rot.newValueSpellInFlight(config.GetSpellInFlight(), config.Uuid)
+	case *proto.APLValue_SpellIsHardcasting:
+		value = rot.newValueSpellIsHardcasting(config.GetSpellIsHardcasting(), config.Uuid)
 
 	// Auras
 	case *proto.APLValue_AuraIsKnown:

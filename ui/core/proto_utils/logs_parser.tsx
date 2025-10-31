@@ -255,6 +255,7 @@ export class SimLog {
 					CastBeganLog.parse(params) ||
 					CastCompletedLog.parse(params) ||
 					StatChangeLog.parse(params) ||
+					CastCanceledLog.parse(params) ||
 					Promise.resolve(new SimLog(params))
 				);
 			}),
@@ -287,6 +288,10 @@ export class SimLog {
 
 	isCastCompleted(): this is CastCompletedLog {
 		return this instanceof CastCompletedLog;
+	}
+
+	isCastCanceled(): this is CastCanceledLog {
+		return this instanceof CastCanceledLog;
 	}
 
 	isStatChange(): this is StatChangeLog {
@@ -997,6 +1002,34 @@ export class CastBeganLog extends SimLog {
 	}
 }
 
+export class CastCanceledLog extends SimLog {
+	constructor(params: SimLogParams) {
+		super(params);
+	}
+
+	toHTML(includeTimestamp = true) {
+		return this.cacheOutput(includeTimestamp, () => (
+			<>
+				{this.toPrefix(includeTimestamp)} Canceled cast {this.actionId!.name}.
+			</>
+		));
+	}
+
+	static parse(params: SimLogParams): Promise<CastCanceledLog> | null {
+		const match = params.raw.match(/Canceled cast (.*)/);
+		if (match) {
+			return ActionId.fromLogString(match[1])
+				.fill(params.source?.index)
+				.then(castId => {
+					params.actionId = castId;
+					return new CastCanceledLog(params);
+				});
+		} else {
+			return null;
+		}
+	}
+}
+
 export class CastCompletedLog extends SimLog {
 	constructor(params: SimLogParams) {
 		super(params);
@@ -1032,11 +1065,12 @@ export class CastLog extends SimLog {
 
 	readonly castBeganLog: CastBeganLog;
 	readonly castCompletedLog: CastCompletedLog | null;
+	readonly castCanceledLog: CastCanceledLog | null;
 
 	// All instances of damage dealt from the completion of this cast until the completion of the next cast.
 	readonly damageDealtLogs: Array<DamageDealtLog>;
 
-	constructor(castBeganLog: CastBeganLog, castCompletedLog: CastCompletedLog | null, damageDealtLogs: Array<DamageDealtLog>) {
+	constructor(castBeganLog: CastBeganLog, castCompletedLog: CastCompletedLog | null, castCanceledLog: CastCanceledLog | null, damageDealtLogs: Array<DamageDealtLog>) {
 		super({
 			raw: castBeganLog.raw,
 			logIndex: castBeganLog.logIndex,
@@ -1051,6 +1085,7 @@ export class CastLog extends SimLog {
 		this.effectiveTime = castBeganLog.effectiveTime;
 		this.castBeganLog = castBeganLog;
 		this.castCompletedLog = castCompletedLog;
+		this.castCanceledLog = castCanceledLog;
 		this.damageDealtLogs = damageDealtLogs;
 
 		if (this.castCompletedLog && this.castBeganLog) {
@@ -1084,6 +1119,7 @@ export class CastLog extends SimLog {
 	static fromLogs(logs: Array<SimLog>): Array<CastLog> {
 		const castBeganLogs = logs.filter((log): log is CastBeganLog => log.isCastBegan());
 		const castCompletedLogs = logs.filter((log): log is CastCompletedLog => log.isCastCompleted());
+		const castCanceledLog = logs.filter((log): log is CastCanceledLog => log.isCastCanceled());
 		const damageDealtLogs = logs.filter((log): log is DamageDealtLog => log.isDamageDealt());
 
 		const toBucketKey = (actionId: ActionId) => {
@@ -1098,12 +1134,14 @@ export class CastLog extends SimLog {
 		};
 		const castBeganLogsByAbility = bucket(castBeganLogs, log => toBucketKey(log.actionId!));
 		const castCompletedLogsByAbility = bucket(castCompletedLogs, log => toBucketKey(log.actionId!));
+		const castCanceledLogsByAbility = bucket(castCanceledLog, log => toBucketKey(log.actionId!));
 		const damageDealtLogsByAbility = bucket(damageDealtLogs, log => toBucketKey(log.actionId!));
 
 		const castLogs: Array<CastLog> = [];
 		Object.keys(castBeganLogsByAbility).forEach(bucketKey => {
 			const abilityCastsBegan = castBeganLogsByAbility[bucketKey]!;
 			const abilityCastsCompleted = castCompletedLogsByAbility[bucketKey];
+			const anilityCastsCanceled = castCanceledLogsByAbility[bucketKey];
 			const abilityDamageDealt = damageDealtLogsByAbility[bucketKey];
 
 			let ddIdx = 0;
@@ -1113,6 +1151,7 @@ export class CastLog extends SimLog {
 				// Assume cast completed log is the same index because they always come in pairs.
 				// Only exception is final pair, where there might be a cast began without a cast completed.
 				let ccLog: CastCompletedLog | null = null;
+				let cancelLog: CastCanceledLog | null = null;
 				let nextCcLog: CastCompletedLog | null = null;
 				if (abilityCastsCompleted && cbIdx < abilityCastsCompleted.length) {
 					ccLog = abilityCastsCompleted[cbIdx];
@@ -1127,7 +1166,7 @@ export class CastLog extends SimLog {
 					ddLogs.push(abilityDamageDealt[ddIdx]);
 					ddIdx++;
 				}
-				castLogs.push(new CastLog(cbLog, ccLog, ddLogs));
+				castLogs.push(new CastLog(cbLog, ccLog, cancelLog, ddLogs));
 			}
 		});
 

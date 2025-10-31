@@ -68,7 +68,7 @@ func (tp *ThunderhawkPet) enable(sim *core.Simulation) {
 
 func (tp *ThunderhawkPet) disable(sim *core.Simulation) {
 	if tp.Hardcast.Expires > sim.CurrentTime {
-		tp.CancelHardcast(sim)
+		tp.CancelHardcast(sim, 0)
 	}
 }
 

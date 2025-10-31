@@ -214,6 +214,7 @@ func (shaman *Shaman) ApplyElementalTalents() {
 			pa.OnAction = func(sim *core.Simulation) {
 				shaman.LavaBurst.CD.Reset()
 				procAura.Activate(sim)
+				shaman.ReactToEvent(sim, false)
 			}
 
 			sim.AddPendingAction(pa)

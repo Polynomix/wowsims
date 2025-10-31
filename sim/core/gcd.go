@@ -74,7 +74,7 @@ func (unit *Unit) ReactToEvent(sim *Simulation, randomizeReactionTime bool) {
 	newEvaluationTime := sim.CurrentTime + unit.ReactionTime
 
 	if randomizeReactionTime {
-		newEvaluationTime = sim.CurrentTime + DurationFromSeconds(sim.RandomFloat("Reaction Time") * 2 * unit.ReactionTime.Seconds())
+		newEvaluationTime = sim.CurrentTime + DurationFromSeconds(sim.RandomFloat("Reaction Time")*2*unit.ReactionTime.Seconds())
 	}
 
 	if unit.NextRotationActionAt() > newEvaluationTime {
@@ -88,9 +88,15 @@ func (unit *Unit) CancelGCDTimer(sim *Simulation) {
 	unit.rotationAction.Cancel(sim)
 }
 
-func (unit *Unit) CancelHardcast(sim *Simulation) {
+func (unit *Unit) CancelHardcast(sim *Simulation, delayToNextAction time.Duration) {
 	unit.Hardcast.Expires = startingCDTime
-	unit.SetGCDTimer(sim, sim.CurrentTime+unit.ReactionTime)
+	unit.SetGCDTimer(sim, sim.CurrentTime+unit.ReactionTime+delayToNextAction)
+	if sim.Log != nil {
+		spell := unit.GetSpell(unit.Hardcast.ActionID)
+		if !spell.Flags.Matches(SpellFlagNoLogs) {
+			unit.Log(sim, "Canceled cast %s", spell.SpellID)
+		}
+	}
 }
 
 func (unit *Unit) WaitUntil(sim *Simulation, readyTime time.Duration) {

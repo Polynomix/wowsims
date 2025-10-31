@@ -49,7 +49,7 @@ message APLGroup {
 	repeated APLValueVariable variables = 3;  // Variables that can be used in this group
 }
 
-// NextIndex: 30
+// NextIndex: 31
 message APLAction {
     APLValue condition = 1; // If set, action will only execute if value is true or != 0.
 
@@ -63,6 +63,7 @@ message APLAction {
         APLActionMultishield multishield = 12;
         APLActionCastAllStatBuffCooldowns cast_all_stat_buff_cooldowns = 23;
         APLActionAutocastOtherCooldowns autocast_other_cooldowns = 7;
+        APLActionCancelCast cancel_cast = 30;
 
         // Timing
         APLActionWait wait = 4;
@@ -99,7 +100,7 @@ message APLAction {
 }
 
 
-// NextIndex: 120
+// NextIndex: 123
 message APLValue {
 	UUID uuid = 85;
 
@@ -153,6 +154,9 @@ message APLValue {
 		// Unit values
 		APLValueUnitIsMoving unit_is_moving = 72;
 		APLValueUnitDistance unit_distance = 105;
+        APLValueUnitIsHardcasting unit_is_hardcasting = 120;
+        APLValueTimeToCastEnd time_to_cast_end = 122;
+
 
         // Rune Resource values
         APLValueCurrentRuneCount current_rune_count = 29;
@@ -187,6 +191,7 @@ message APLValue {
         APLValueSpellGCDHastedDuration spell_gcd_hasted_duration = 115;
         APLValueSpellFullCooldown spell_full_cooldown = 116;
         APLValueSpellInFlight spell_in_flight = 118;
+        APLValueSpellIsHardcasting spell_is_hardcasting = 121;
 
         // Aura values
         APLValueAuraIsKnown aura_is_known = 73;
@@ -305,6 +310,10 @@ message APLActionCastAllStatBuffCooldowns {
 }
 
 message APLActionAutocastOtherCooldowns {
+}
+
+message APLActionCancelCast {
+    int32 delay = 1;
 }
 
 message APLActionWait {
@@ -508,6 +517,12 @@ message APLValueUnitIsMoving {
 message APLValueUnitDistance {
     UnitReference source_unit = 1;
 }
+message APLValueUnitIsHardcasting {
+    UnitReference source_unit = 1;
+}
+message APLValueTimeToCastEnd {
+    UnitReference source_unit = 1;
+}
 message APLValueCurrentHealth {
     UnitReference source_unit = 1;
 }
@@ -652,6 +667,9 @@ message APLValueSpellFullCooldown{
 }
 message APLValueSpellInFlight{
 	ActionID spell_id = 1;
+}
+message APLValueSpellIsHardcasting{
+    ActionID spell_id = 1;
 }
 
 message APLValueAuraIsKnown {

@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/wowsims/mop/sim/core/proto"
 	"github.com/wowsims/mop/sim/core/stats"
@@ -504,4 +505,30 @@ func (action *APLActionAutocastOtherCooldowns) PostFinalize(rot *APLRotation) {
 
 		rot.ValidationMessage(proto.LogLevel_Information, "%s will cast the following spells: %s", action, StringFromActionIDs(actionIDs))
 	}
+}
+
+type APLActionCancelCast struct {
+	defaultAPLActionImpl
+	character *Character
+	delay     int32
+}
+
+func (rot *APLRotation) newActionCancelCast(config *proto.APLActionCancelCast) APLActionImpl {
+	unit := rot.unit
+	return &APLActionCancelCast{
+		character: unit.Env.Raid.GetPlayerFromUnit(unit).GetCharacter(),
+		delay:     config.Delay,
+	}
+}
+
+func (action *APLActionCancelCast) IsReady(sim *Simulation) bool {
+	return action.character.Hardcast.Expires > sim.CurrentTime
+}
+
+func (action *APLActionCancelCast) Execute(sim *Simulation) {
+	action.character.CancelHardcast(sim, time.Duration(action.delay)*time.Millisecond)
+}
+
+func (action *APLActionCancelCast) String() string {
+	return "Cancel Cast"
 }
