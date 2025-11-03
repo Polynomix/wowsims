@@ -86,13 +86,12 @@ func calculateEclipseMasteryBonus(masteryPoints float64, includeBasePoints bool)
 }
 
 func (moonkin *BalanceDruid) RegisterSharedEclipseSpellMod() {
-	docEclipseMasteryBonus := 0.0
 	eclipseMasteryBonus := calculateEclipseMasteryBonus(moonkin.GetMasteryPoints(), true)
 
 	moonkin.EclipseSpellMod = moonkin.AddDynamicMod(core.SpellModConfig{
 		School:     core.SpellSchoolNone,
 		Kind:       core.SpellMod_DamageDone_Pct,
-		FloatValue: docEclipseMasteryBonus + eclipseMasteryBonus,
+		FloatValue: eclipseMasteryBonus,
 	})
 
 	moonkin.AddOnMasteryStatChanged(func(sim *core.Simulation, oldMastery float64, newMastery float64) {
@@ -110,7 +109,7 @@ func (moonkin *BalanceDruid) RegisterSharedEclipseSpellMod() {
 
 func (moonkin *BalanceDruid) UpdateEclipseSpellMod(school core.SpellSchool, shouldActivate bool, sim *core.Simulation) {
 	if !shouldActivate {
-		moonkin.EclipseSpellMod.School = core.SpellSchoolNone
+		moonkin.EclipseSpellMod.School = school
 		moonkin.EclipseSpellMod.Deactivate()
 		return
 	}
