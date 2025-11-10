@@ -166,8 +166,8 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-CelestialHarmonyBattlegear"
  value: {
-  dps: 140245.04728
-  tps: 118517.48216
+  dps: 138518.03191
+  tps: 116519.9953
  }
 }
 dps_results: {

@@ -214,11 +214,17 @@ func (shaman *Shaman) makeFTProcTriggerAura(itemSlot proto.ItemSlot, triggerProc
 		ProcMask:           triggerProcMask,
 		Outcome:            core.OutcomeLanded,
 		Callback:           core.CallbackOnSpellHitDealt,
+		Duration:           core.NeverExpires,
 		TriggerImmediately: true,
 
 		Handler: func(sim *core.Simulation, _ *core.Spell, result *core.SpellResult) {
 			flameTongueSpell.Cast(sim, result.Target)
 		},
+	})
+	aura.ApplyOnReset(func(aura *core.Aura, sim *core.Simulation) {
+		if shaman.Equipment[itemSlot].TempEnchant == flametongueEnchantID {
+			aura.Activate(sim)
+		}
 	})
 
 	shaman.RegisterItemSwapCallback([]proto.ItemSlot{itemSlot}, func(sim *core.Simulation, is proto.ItemSlot) {
@@ -324,11 +330,7 @@ func (shaman *Shaman) RegisterFlametongueImbue(procMask core.ProcMask) {
 			}
 			if shaman.SelfBuffs.ImbueMH == proto.ShamanImbue_FlametongueWeapon {
 				weapon.TempEnchant = flametongueEnchantID
-				if shaman.ItemSwap.IsEnabled() {
-					shaman.ItemSwap.AddTempEnchant(flametongueEnchantID, itemSlot, false)
-				}
 			}
-
 			triggerProcMask = core.ProcMaskMeleeMH | core.ProcMaskMeleeProc
 		case itemSlot == proto.ItemSlot_ItemSlotOffHand:
 			weapon = shaman.OffHand()
@@ -337,12 +339,14 @@ func (shaman *Shaman) RegisterFlametongueImbue(procMask core.ProcMask) {
 			}
 			if shaman.SelfBuffs.ImbueOH == proto.ShamanImbue_FlametongueWeapon {
 				weapon.TempEnchant = flametongueEnchantID
-				if shaman.ItemSwap.IsEnabled() {
-					shaman.ItemSwap.AddTempEnchant(flametongueEnchantID, itemSlot, false)
-				}
 			}
-
 			triggerProcMask = core.ProcMaskMeleeOH
+		default:
+			continue
+		}
+
+		if shaman.ItemSwap.IsEnabled() {
+			shaman.ItemSwap.AddTempEnchant(flametongueEnchantID, itemSlot, false)
 		}
 
 		flameTongueSpell := shaman.newFlametongueImbueSpell(weapon)
