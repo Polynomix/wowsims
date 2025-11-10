@@ -63,7 +63,7 @@ func (shaman *Shaman) newWindfuryImbueSpell(isMH bool) *core.Spell {
 	}
 
 	spellConfig := core.SpellConfig{
-		ActionID:       core.ActionID{SpellID: 8232, Tag: int32(tag)},
+		ActionID:       core.ActionID{SpellID: 25504, Tag: int32(tag)},
 		SpellSchool:    core.SpellSchoolPhysical,
 		ProcMask:       procMask,
 		ClassSpellMask: SpellMaskWindfuryWeapon,
@@ -113,7 +113,9 @@ func (shaman *Shaman) makeWFProcTriggerAura(dpm *core.DynamicProcManager, procMa
 			}
 		},
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Activate(sim)
+			if shaman.MainHand().TempEnchant == windfuryEnchantID || shaman.OffHand().TempEnchant == windfuryEnchantID {
+				aura.Activate(sim)
+			}
 		},
 	})
 	return aura
@@ -123,10 +125,29 @@ func (shaman *Shaman) getWindfuryFixedProcChance(procMask core.ProcMask) float64
 	return core.TernaryFloat64(procMask == core.ProcMaskMelee, 0.36, 0.2)
 }
 
+func (shaman *Shaman) registerWFApplySpell(aura *core.Aura) {
+	shaman.RegisterSpell(core.SpellConfig{
+		ActionID:    core.ActionID{SpellID: 8232},
+		SpellSchool: core.SpellSchoolNature,
+		Flags:       core.SpellFlagAPL | core.SpellFlagNoMetrics | core.SpellFlagNoOnCastComplete,
+		ManaCost: core.ManaCostOptions{
+			BaseCostPercent: 8.2,
+		},
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				GCD: core.GCDDefault,
+			},
+		},
+		ApplyEffects: func(sim *core.Simulation, target *core.Unit, spell *core.Spell) {
+			shaman.ActiveMHProcAura.Deactivate(sim)
+			shaman.ActiveMHProcAura = aura
+			shaman.MainHand().TempEnchant = windfuryEnchantID
+			aura.Activate(sim)
+		},
+	})
+}
+
 func (shaman *Shaman) RegisterWindfuryImbue(procMask core.ProcMask) {
-	if procMask == core.ProcMaskUnknown && !shaman.ItemSwap.IsEnabled() {
-		return
-	}
 
 	mask := core.ProcMaskUnknown
 
@@ -154,14 +175,20 @@ func (shaman *Shaman) RegisterWindfuryImbue(procMask core.ProcMask) {
 	mhSpell := shaman.newWindfuryImbueSpell(true)
 	ohSpell := shaman.newWindfuryImbueSpell(false)
 
-	aura := shaman.makeWFProcTriggerAura(dpm, &mask, mhSpell, ohSpell)
+	procAura := shaman.makeWFProcTriggerAura(dpm, &mask, mhSpell, ohSpell)
 
-	shaman.RegisterOnItemSwapWithImbue(windfuryEnchantID, &mask, aura)
+	shaman.registerWFApplySpell(procAura)
+
+	if shaman.SelfBuffs.ImbueMH == proto.ShamanImbue_WindfuryWeapon {
+		shaman.ActiveMHProcAura = procAura
+	}
+
+	shaman.RegisterOnItemSwapWithImbue(windfuryEnchantID, &mask, procAura)
 }
 
 func (shaman *Shaman) newFlametongueImbueSpell(weapon *core.Item) *core.Spell {
 	return shaman.RegisterSpell(core.SpellConfig{
-		ActionID:         core.ActionID{SpellID: int32(8024)},
+		ActionID:         core.ActionID{SpellID: int32(10444)},
 		SpellSchool:      core.SpellSchoolFire,
 		ProcMask:         core.ProcMaskSpellDamageProc,
 		ClassSpellMask:   SpellMaskFlametongueWeapon,
@@ -239,10 +266,29 @@ func (shaman *Shaman) makeFTProcTriggerAura(itemSlot proto.ItemSlot, triggerProc
 	return aura
 }
 
+func (shaman *Shaman) registerFTApplySpell(aura *core.Aura) {
+	shaman.RegisterSpell(core.SpellConfig{
+		ActionID:    core.ActionID{SpellID: 8024},
+		SpellSchool: core.SpellSchoolFire,
+		Flags:       core.SpellFlagAPL | core.SpellFlagNoMetrics | core.SpellFlagNoOnCastComplete,
+		ManaCost: core.ManaCostOptions{
+			BaseCostPercent: 8.2,
+		},
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				GCD: core.GCDDefault,
+			},
+		},
+		ApplyEffects: func(sim *core.Simulation, target *core.Unit, spell *core.Spell) {
+			shaman.ActiveMHProcAura.Deactivate(sim)
+			shaman.ActiveMHProcAura = aura
+			shaman.MainHand().TempEnchant = flametongueEnchantID
+			aura.Activate(sim)
+		},
+	})
+}
+
 func (shaman *Shaman) RegisterFlametongueImbue(procMask core.ProcMask) {
-	if procMask == core.ProcMaskUnknown && !shaman.ItemSwap.IsEnabled() {
-		return
-	}
 
 	magicDamageBonus := 1.07
 
@@ -269,27 +315,46 @@ func (shaman *Shaman) RegisterFlametongueImbue(procMask core.ProcMask) {
 	for _, itemSlot := range core.AllWeaponSlots() {
 		var weapon *core.Item
 		var triggerProcMask core.ProcMask
+		var procAura *core.Aura
 		switch {
-		case shaman.SelfBuffs.ImbueMH == proto.ShamanImbue_FlametongueWeapon && itemSlot == proto.ItemSlot_ItemSlotMainHand:
+		case itemSlot == proto.ItemSlot_ItemSlotMainHand:
 			weapon = shaman.MainHand()
+			if weapon == nil {
+				continue
+			}
+			if shaman.SelfBuffs.ImbueMH == proto.ShamanImbue_FlametongueWeapon {
+				weapon.TempEnchant = flametongueEnchantID
+				if shaman.ItemSwap.IsEnabled() {
+					shaman.ItemSwap.AddTempEnchant(flametongueEnchantID, itemSlot, false)
+				}
+			}
+
 			triggerProcMask = core.ProcMaskMeleeMH | core.ProcMaskMeleeProc
-		case shaman.SelfBuffs.ImbueOH == proto.ShamanImbue_FlametongueWeapon && itemSlot == proto.ItemSlot_ItemSlotOffHand:
+		case itemSlot == proto.ItemSlot_ItemSlotOffHand:
 			weapon = shaman.OffHand()
+			if weapon == nil {
+				continue
+			}
+			if shaman.SelfBuffs.ImbueOH == proto.ShamanImbue_FlametongueWeapon {
+				weapon.TempEnchant = flametongueEnchantID
+				if shaman.ItemSwap.IsEnabled() {
+					shaman.ItemSwap.AddTempEnchant(flametongueEnchantID, itemSlot, false)
+				}
+			}
+
 			triggerProcMask = core.ProcMaskMeleeOH
 		}
 
-		if weapon == nil {
-			continue
-		}
-
-		weapon.TempEnchant = flametongueEnchantID
-
-		if shaman.ItemSwap.IsEnabled() {
-			shaman.ItemSwap.AddTempEnchant(flametongueEnchantID, itemSlot, false)
-		}
-
 		flameTongueSpell := shaman.newFlametongueImbueSpell(weapon)
-		shaman.makeFTProcTriggerAura(itemSlot, triggerProcMask, flameTongueSpell)
+		procAura = shaman.makeFTProcTriggerAura(itemSlot, triggerProcMask, flameTongueSpell)
+		if itemSlot == proto.ItemSlot_ItemSlotMainHand {
+			procAura.AttachDependentAura(magicDamageAura)
+			shaman.registerFTApplySpell(procAura)
+			if shaman.SelfBuffs.ImbueMH == proto.ShamanImbue_FlametongueWeapon {
+				shaman.ActiveMHProcAura = procAura
+			}
+		}
+
 	}
 
 	shaman.setupItemSwapImbue(proto.ShamanImbue_FlametongueWeapon, flametongueEnchantID)

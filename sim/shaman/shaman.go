@@ -176,6 +176,7 @@ type Shaman struct {
 	UnleashFrost        *core.Spell
 	UnleashWind         *core.Spell
 	WindfuryUnleashAura *core.Aura
+	ActiveMHProcAura    *core.Aura
 
 	MaelstromWeaponAura           *core.Aura
 	AncestralSwiftnessInstantAura *core.Aura
