@@ -113,6 +113,7 @@ import {
 	APLValueSpellFullCooldown,
 	APLValueDotTimeToNextTick,
 	APLValueSpellInFlight,
+	APLValueShamanImbueId,
 } from '../../proto/apl.js';
 import { Class, Spec } from '../../proto/common.js';
 import { ShamanTotems_TotemType as TotemType } from '../../proto/shaman.js';
@@ -1548,6 +1549,14 @@ const valueKindFactories: { [f in ValidAPLValueKind]: ValueKindConfig<APLValueIm
 		shortDescription: i18n.t('rotation_tab.apl.values.protection_paladin_damage_taken_last_global.tooltip'),
 		newValue: APLValueProtectionPaladinDamageTakenLastGlobal.create,
 		includeIf: (player: Player<any>, _isPrepull: boolean) => player.getSpec() === Spec.SpecProtectionPaladin,
+		fields: [],
+	}),
+	shamanImbueId: inputBuilder({
+		label: 'Imbue Id',
+		submenu: ['shaman'],
+		shortDescription: 'The ID of the current Main Hand Imbue',
+		newValue: APLValueShamanImbueId.create,
+		includeIf: (player: Player<any>, _isPrepull: boolean) => player.getSpec() === Spec.SpecElementalShaman,
 		fields: [],
 	}),
 	variableRef: inputBuilder({

@@ -14,6 +14,8 @@ func (shaman *Shaman) NewAPLValue(rot *core.APLRotation, config *proto.APLValue)
 		return shaman.newValueTotemRemainingTime(rot, config.GetTotemRemainingTime(), config.Uuid)
 	case *proto.APLValue_ShamanFireElementalDuration:
 		return shaman.newValueFireElementalDuration(config.GetShamanFireElementalDuration(), config.Uuid)
+	case *proto.APLValue_ShamanImbueId:
+		return shaman.newValueShamanImbueId(config.GetShamanImbueId(), config.Uuid)
 	default:
 		return nil
 	}
@@ -78,4 +80,27 @@ func (value *APLValueShamanFireElementalDuration) GetDuration(sim *core.Simulati
 
 func (value *APLValueShamanFireElementalDuration) String() string {
 	return "Fire Elemental Total Duration"
+}
+
+type APLValueShamanImbueId struct {
+	core.DefaultAPLValueImpl
+	shaman *Shaman
+}
+
+func (shaman *Shaman) newValueShamanImbueId(_ *proto.APLValueShamanImbueId, _ *proto.UUID) core.APLValue {
+	return &APLValueShamanImbueId{
+		shaman: shaman,
+	}
+}
+
+func (value *APLValueShamanImbueId) Type() proto.APLValueType {
+	return proto.APLValueType_ValueTypeInt
+}
+
+func (value *APLValueShamanImbueId) GetInt(sim *core.Simulation) int32 {
+	return value.shaman.MainHand().TempEnchant
+}
+
+func (value *APLValueShamanImbueId) String() string {
+	return "Shaman Imbue ID"
 }
