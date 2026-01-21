@@ -11,7 +11,7 @@ func (fireElemental *FireElemental) registerFireBlast() {
 		ActionID:    core.ActionID{SpellID: 57984},
 		SpellSchool: core.SpellSchoolFire,
 		ProcMask:    core.ProcMaskSpellDamage,
-		Flags:       SpellFlagShamanSpell,
+		Flags:       SpellFlagShamanSpell | core.SpellFlagAPL,
 
 		ManaCost: core.ManaCostOptions{
 			FlatCost: 40,
@@ -27,11 +27,16 @@ func (fireElemental *FireElemental) registerFireBlast() {
 		CritMultiplier:   fireElemental.DefaultCritMultiplier(),
 		ThreatMultiplier: 1,
 		BonusCoefficient: 0.42899999022,
+		ExtraCastCondition: func(_ *core.Simulation, _ *core.Unit) bool {
+			return fireElemental.IsActive()
+		},
 		ApplyEffects: func(sim *core.Simulation, target *core.Unit, spell *core.Spell) {
 			baseDamage := 13.8 //Magic number from beta testing
 			spell.CalcAndDealDamage(sim, target, baseDamage, spell.OutcomeMagicHitAndCrit)
 		},
 	})
+
+	fireElemental.shamanOwner.Spellbook = append(fireElemental.shamanOwner.Spellbook, fireElemental.FireBlast)
 }
 
 func (fireElemental *FireElemental) registerFireNova() {
@@ -40,7 +45,7 @@ func (fireElemental *FireElemental) registerFireNova() {
 		ActionID:    core.ActionID{SpellID: 117588},
 		SpellSchool: core.SpellSchoolFire,
 		ProcMask:    core.ProcMaskSpellDamage,
-		Flags:       core.SpellFlagAoE | SpellFlagShamanSpell,
+		Flags:       core.SpellFlagAoE | SpellFlagShamanSpell | core.SpellFlagAPL,
 
 		ManaCost: core.ManaCostOptions{
 			FlatCost: 30,
@@ -60,12 +65,17 @@ func (fireElemental *FireElemental) registerFireNova() {
 		ThreatMultiplier: 1,
 		BonusCoefficient: 1.00,
 
+		ExtraCastCondition: func(_ *core.Simulation, _ *core.Unit) bool {
+			return fireElemental.IsActive()
+		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
 			spell.CalcAndDealAoeDamageWithVariance(sim, spell.OutcomeMagicHitAndCrit, func(sim *core.Simulation, _ *core.Spell) float64 {
 				return sim.Roll(49*levelScalingMultiplier, 58*levelScalingMultiplier) //Estimated from beta testing 49 58
 			})
 		},
 	})
+
+	fireElemental.shamanOwner.Spellbook = append(fireElemental.shamanOwner.Spellbook, fireElemental.FireNova)
 }
 
 func (fireElemental *FireElemental) registerImmolate() {
@@ -75,7 +85,7 @@ func (fireElemental *FireElemental) registerImmolate() {
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolFire,
 		ProcMask:    core.ProcMaskSpellDamage,
-		Flags:       SpellFlagShamanSpell,
+		Flags:       SpellFlagShamanSpell | core.SpellFlagAPL,
 
 		DamageMultiplier: 1,
 		CritMultiplier:   fireElemental.DefaultCritMultiplier(),
@@ -95,7 +105,7 @@ func (fireElemental *FireElemental) registerImmolate() {
 			},
 		},
 		ExtraCastCondition: func(sim *core.Simulation, target *core.Unit) bool {
-			return !fireElemental.IsGuardian()
+			return fireElemental.IsActive() && !fireElemental.IsGuardian()
 		},
 		Dot: core.DotConfig{
 			Aura: core.Aura{
@@ -118,6 +128,8 @@ func (fireElemental *FireElemental) registerImmolate() {
 			spell.Dot(target).Apply(sim)
 		},
 	})
+
+	fireElemental.shamanOwner.Spellbook = append(fireElemental.shamanOwner.Spellbook, fireElemental.Immolate)
 }
 
 func (fireElemental *FireElemental) registerEmpower() {
@@ -134,7 +146,7 @@ func (fireElemental *FireElemental) registerEmpower() {
 	fireElemental.Empower = fireElemental.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolFire,
-		Flags:       core.SpellFlagChanneled,
+		Flags:       core.SpellFlagChanneled | core.SpellFlagAPL,
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    fireElemental.NewTimer(),
@@ -159,10 +171,12 @@ func (fireElemental *FireElemental) registerEmpower() {
 			},
 		},
 		ExtraCastCondition: func(sim *core.Simulation, target *core.Unit) bool {
-			return !fireElemental.IsGuardian()
+			return fireElemental.IsActive() && !fireElemental.IsGuardian()
 		},
 		ApplyEffects: func(sim *core.Simulation, target *core.Unit, spell *core.Spell) {
 			spell.Hot(target).Apply(sim)
 		},
 	})
+
+	fireElemental.shamanOwner.Spellbook = append(fireElemental.shamanOwner.Spellbook, fireElemental.Empower)
 }
